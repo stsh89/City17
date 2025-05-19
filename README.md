@@ -1,2 +1,3 @@
 # City17
-A comprehensive Rust project demonstrating various development aspects, patterns, and ecosystem integration
+
+City17 is a Rust project that brings together various aspects of Rust development into a single, cohesive example. It integrates popular crates, explores different project types—including web applications and CLI tools—and demonstrates techniques for instrumentation, testing, and overall project structure. Designed as a practical reference, City17 serves as a consolidated blueprint for Rust programming concepts, offering insights into diverse approaches within the ecosystem.
