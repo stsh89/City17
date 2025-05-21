@@ -1,5 +1,14 @@
-use crate::{command_line::CommandLine, operations::InstallSqlxCliOperation};
+use crate::{
+    command_line::CommandLine,
+    operations::{
+        CreateDockerComposePostgresEnvFileOperation, InstallSqlxCliOperation,
+        NewDockerComposeDatabaseSettings,
+    },
+};
 use clap::{Parser, Subcommand};
+
+const POSTGRES_USER: &str = "gordon";
+const POSTGRES_DB: &str = "city17_dev";
 
 #[derive(Parser)]
 pub struct Cli {
@@ -14,6 +23,7 @@ pub struct CliState {
 #[derive(Subcommand)]
 pub enum Commands {
     InstallSqlxCli,
+    CreateDockerComposePostgresEnvFile,
 }
 
 impl Commands {
@@ -25,8 +35,32 @@ impl Commands {
                 command_line: &command_line,
             }
             .execute()?,
+            Self::CreateDockerComposePostgresEnvFile => {
+                CreateDockerComposePostgresEnvFileOperation {
+                    command_line: &command_line,
+                }
+                .execute(NewDockerComposeDatabaseSettings {
+                    username: POSTGRES_USER.to_string(),
+                    password: generate_password(16),
+                    database_name: POSTGRES_DB.to_string(),
+                })?
+            }
         };
 
         Ok(())
     }
+}
+
+fn generate_password(length: usize) -> String {
+    use rand::{Rng, distr::Alphanumeric};
+
+    let rng = rand::rng();
+
+    let password: String = rng
+        .sample_iter(Alphanumeric)
+        .take(length)
+        .map(char::from)
+        .collect();
+
+    password
 }

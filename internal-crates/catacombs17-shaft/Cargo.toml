@@ -7,3 +7,4 @@ edition.workspace = true
 clap = { workspace = true, features = ["derive"] }
 eyre = { workspace = true }
 thiserror = { workspace = true }
+rand = { workspace = true }
