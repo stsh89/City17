@@ -5,6 +5,7 @@ mod create_migration;
 mod get_docker_compose_config;
 mod get_docker_compose_datbase_env;
 mod install_sqlx_cli;
+mod remove_last_migration;
 mod stop_and_remove_containers;
 
 use std::path::{Path, PathBuf};
@@ -16,6 +17,7 @@ pub use create_migration::*;
 pub use get_docker_compose_config::*;
 pub use get_docker_compose_datbase_env::*;
 pub use install_sqlx_cli::*;
+pub use remove_last_migration::*;
 pub use stop_and_remove_containers::*;
 
 use crate::error::OperationalError;

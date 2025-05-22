@@ -4,7 +4,8 @@ use crate::{
         CreateAndStartContainersOperation, CreateDatabaseOperation,
         CreateDockerComposePostgresEnvFileOperation, CreateMigrationOperation,
         GetDockerComposeConfigOperation, InstallSqlxCliOperation, MigrationParameters,
-        NewDockerComposeDatabaseEnv, StopAndRemoveContainersOperation,
+        NewDockerComposeDatabaseEnv, RemoveLastMigrationOperation,
+        StopAndRemoveContainersOperation,
     },
 };
 use clap::{Parser, Subcommand};
@@ -36,6 +37,10 @@ pub enum Commands {
     },
     GetDockerComposeConfig,
     InstallSqlxCli,
+    RemoveLastMigration {
+        #[arg(long)]
+        crate_path: String,
+    },
     StopAndRemoveContainers,
 }
 
@@ -81,6 +86,10 @@ impl Commands {
                 command_line: &command_line,
             }
             .execute()?,
+            Self::RemoveLastMigration { crate_path } => RemoveLastMigrationOperation {
+                command_line: &command_line,
+            }
+            .execute(&crate_path)?,
             Self::StopAndRemoveContainers => StopAndRemoveContainersOperation {
                 command_line: &command_line,
             }
