@@ -1,0 +1,6 @@
+[package]
+name = "catacombs17-storage"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
