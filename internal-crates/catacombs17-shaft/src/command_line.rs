@@ -2,8 +2,9 @@ use crate::{
     error::OperationalError,
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
-        CreateAndStartContainers, CreateDatabase, DockerComposeDatabaseEnv, FileLocation,
-        GetDockerComposeConfig, InstallSqlxCli, StopAndRemoveContainers,
+        CreateAndStartContainers, CreateDatabase, CreateMigration, CreateMigrationParameters,
+        DockerComposeDatabaseEnv, FileLocation, GetDockerComposeConfig, InstallSqlxCli,
+        StopAndRemoveContainers,
     },
 };
 use eyre::Context;
@@ -74,6 +75,37 @@ impl CreateDatabase for CommandLine {
     }
 }
 
+impl CreateMigration for CommandLine {
+    /// Execute `sqlx migrate add` command.
+    fn create_migration(
+        &self,
+        create_migration_parameters: CreateMigrationParameters,
+    ) -> Result<(), OperationalError> {
+        let CreateMigrationParameters {
+            migration_name,
+            crate_path,
+        } = create_migration_parameters;
+
+        let error_message = format!(
+            "failed to create migration, try running `sqlx migrate add -r {}`",
+            migration_name,
+        );
+
+        let status = Command::new(SQLX_PROGRAM)
+            .args(["migrate", "add", "-r", &migration_name])
+            .current_dir(crate_path.deref())
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message.clone())?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
 impl GetDockerComposeConfig for CommandLine {
     /// Execute `docker compose config` command.
     fn get_docker_compose_config(
@@ -130,7 +162,7 @@ impl LocateWorkspaceCargoToml for CommandLine {
         if output.status.success() {
             let location = String::from_utf8_lossy(&output.stdout).to_string();
 
-            FileLocation::from_str(&location)
+            FileLocation::from_str(location.trim())
         } else {
             Err(eyre::eyre!(error_message).into())
         }

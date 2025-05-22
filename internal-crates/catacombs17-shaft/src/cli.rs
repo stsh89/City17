@@ -2,8 +2,9 @@ use crate::{
     command_line::CommandLine,
     operations::{
         CreateAndStartContainersOperation, CreateDatabaseOperation,
-        CreateDockerComposePostgresEnvFileOperation, GetDockerComposeConfigOperation,
-        InstallSqlxCliOperation, NewDockerComposeDatabaseEnv, StopAndRemoveContainersOperation,
+        CreateDockerComposePostgresEnvFileOperation, CreateMigrationOperation,
+        GetDockerComposeConfigOperation, InstallSqlxCliOperation, MigrationParameters,
+        NewDockerComposeDatabaseEnv, StopAndRemoveContainersOperation,
     },
 };
 use clap::{Parser, Subcommand};
@@ -26,6 +27,13 @@ pub enum Commands {
     CreateAndStartContainers,
     CreateDatabase,
     CreateDockerComposePostgresEnvFile,
+    CreateMigration {
+        #[arg(long)]
+        name: String,
+
+        #[arg(long)]
+        crate_path: String,
+    },
     GetDockerComposeConfig,
     InstallSqlxCli,
     StopAndRemoveContainers,
@@ -54,6 +62,13 @@ impl Commands {
                     database_name: POSTGRES_DB.to_string(),
                 })?
             }
+            Self::CreateMigration { name, crate_path } => CreateMigrationOperation {
+                command_line: &command_line,
+            }
+            .execute(MigrationParameters {
+                migration_name: &name,
+                crate_path: &crate_path,
+            })?,
             Self::GetDockerComposeConfig => {
                 let config = GetDockerComposeConfigOperation {
                     command_line: &command_line,

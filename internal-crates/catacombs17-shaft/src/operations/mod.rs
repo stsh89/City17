@@ -1,6 +1,7 @@
 mod create_and_start_containers;
 mod create_database;
 mod create_docker_compose_postgres_env_file;
+mod create_migration;
 mod get_docker_compose_config;
 mod get_docker_compose_datbase_env;
 mod install_sqlx_cli;
@@ -11,6 +12,7 @@ use std::path::{Path, PathBuf};
 pub use create_and_start_containers::*;
 pub use create_database::*;
 pub use create_docker_compose_postgres_env_file::*;
+pub use create_migration::*;
 pub use get_docker_compose_config::*;
 pub use get_docker_compose_datbase_env::*;
 pub use install_sqlx_cli::*;
@@ -43,6 +45,19 @@ impl FileLocation {
 
     pub fn parent(&self) -> FolderLocation {
         FolderLocation(self.0.parent().unwrap().to_path_buf())
+    }
+}
+
+impl FolderLocation {
+    pub fn new(path: PathBuf) -> Result<Self, OperationalError> {
+        if !path.is_dir() {
+            return Err(OperationalError::InvalidArgument(format!(
+                "`{}` is not a directory path",
+                path.display()
+            )));
+        }
+
+        Ok(FolderLocation(path))
     }
 }
 
