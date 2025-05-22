@@ -10,8 +10,6 @@ mod revert_migration;
 mod run_migrations;
 mod stop_and_remove_containers;
 
-use std::path::{Path, PathBuf};
-
 pub use create_and_start_containers::*;
 pub use create_database::*;
 pub use create_docker_compose_postgres_env_file::*;
@@ -25,6 +23,7 @@ pub use run_migrations::*;
 pub use stop_and_remove_containers::*;
 
 use crate::error::OperationalError;
+use std::path::{Path, PathBuf};
 
 const POSTGRES_USER_KEY: &str = "POSTGRES_USER";
 const POSTGRES_PASSWORD_KEY: &str = "POSTGRES_PASSWORD";
