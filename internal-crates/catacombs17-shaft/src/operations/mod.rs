@@ -1,7 +1,9 @@
+mod create_and_start_containers;
 mod create_docker_compose_postgres_env_file;
 mod install_sqlx_cli;
 mod stop_and_remove_containers;
 
+pub use create_and_start_containers::*;
 pub use create_docker_compose_postgres_env_file::*;
 pub use install_sqlx_cli::*;
 pub use stop_and_remove_containers::*;
@@ -11,8 +13,6 @@ use crate::error::OperationalError;
 const POSTGRES_USER_KEY: &str = "POSTGRES_USER";
 const POSTGRES_PASSWORD_KEY: &str = "POSTGRES_PASSWORD";
 const POSTGRES_DB_KEY: &str = "POSTGRES_DB";
-const DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME: &str = "postgres.env";
-const DOCKER_DIRECTORY_NAME: &str = "docker";
 
 pub struct DockerComposeDatabaseSettings {
     pub username: String,

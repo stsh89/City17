@@ -1,10 +1,10 @@
-use super::{
-    DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, DOCKER_DIRECTORY_NAME, DockerComposeDatabaseSettings,
-    NewDockerComposeDatabaseSettings,
-};
+use super::{DockerComposeDatabaseSettings, NewDockerComposeDatabaseSettings};
 use crate::{
     error::OperationalError,
-    internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml},
+    internal_operations::{
+        DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, GetDockerComposeFileLocationOperation,
+        LocateWorkspaceCargoToml,
+    },
 };
 
 pub struct CreateDockerComposePostgresEnvFileOperation<'a, CL> {
@@ -19,25 +19,32 @@ where
         &self,
         new_settings: NewDockerComposeDatabaseSettings,
     ) -> Result<(), OperationalError> {
-        let workspace_location = GetWorkspaceLocationOperation {
+        let docker_compose_file_location = GetDockerComposeFileLocationOperation {
             command_line: self.command_line,
         }
         .execute()?;
 
-        let file_path = workspace_location
-            .join(DOCKER_DIRECTORY_NAME)
-            .join(DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME);
+        let Some(docker_compose_directory) = docker_compose_file_location.parent() else {
+            return Err(eyre::eyre!(
+                "corrupted docker compose file location: `{}`",
+                docker_compose_file_location.display()
+            )
+            .into());
+        };
 
-        if file_path.exists() {
+        let postgres_env_file_path =
+            docker_compose_directory.join(DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME);
+
+        if postgres_env_file_path.exists() {
             return Err(OperationalError::AlreadyExists(format!(
                 "file `{}`",
-                file_path.display()
+                postgres_env_file_path.display()
             )));
         }
 
         let settings = DockerComposeDatabaseSettings::new(new_settings)?;
 
-        std::fs::write(&file_path, settings.env_string()).map_err(eyre::Error::new)?;
+        std::fs::write(&postgres_env_file_path, settings.env_string()).map_err(eyre::Error::new)?;
 
         Ok(())
     }

@@ -4,20 +4,20 @@ use crate::{
 };
 use std::path::Path;
 
-pub trait StopAndRemoveContainers {
-    fn stop_and_remove_containers(
+pub trait CreateAndStartContainers {
+    fn create_and_start_containers(
         &self,
-        docker_compose_file_location: &Path,
+        docker_compose_file_path: &Path,
     ) -> Result<(), OperationalError>;
 }
 
-pub struct StopAndRemoveContainersOperation<'a, CL> {
+pub struct CreateAndStartContainersOperation<'a, CL> {
     pub command_line: &'a CL,
 }
 
-impl<'a, CL> StopAndRemoveContainersOperation<'a, CL>
+impl<'a, CL> CreateAndStartContainersOperation<'a, CL>
 where
-    CL: StopAndRemoveContainers + LocateWorkspaceCargoToml,
+    CL: LocateWorkspaceCargoToml + CreateAndStartContainers,
 {
     pub fn execute(&self) -> Result<(), OperationalError> {
         let docker_compose_file_location = GetDockerComposeFileLocationOperation {
@@ -26,6 +26,8 @@ where
         .execute()?;
 
         self.command_line
-            .stop_and_remove_containers(&docker_compose_file_location)
+            .create_and_start_containers(&docker_compose_file_location)?;
+
+        Ok(())
     }
 }

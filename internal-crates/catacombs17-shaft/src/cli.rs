@@ -1,8 +1,9 @@
 use crate::{
     command_line::CommandLine,
     operations::{
-        CreateDockerComposePostgresEnvFileOperation, InstallSqlxCliOperation,
-        NewDockerComposeDatabaseSettings, StopAndRemoveContainersOperation,
+        CreateAndStartContainersOperation, CreateDockerComposePostgresEnvFileOperation,
+        InstallSqlxCliOperation, NewDockerComposeDatabaseSettings,
+        StopAndRemoveContainersOperation,
     },
 };
 use clap::{Parser, Subcommand};
@@ -22,6 +23,7 @@ pub struct CliState {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    CreateAndStartContainers,
     CreateDockerComposePostgresEnvFile,
     InstallSqlxCli,
     StopAndRemoveContainers,
@@ -32,6 +34,10 @@ impl Commands {
         let CliState { command_line } = cli_state;
 
         match self {
+            Self::CreateAndStartContainers => CreateAndStartContainersOperation {
+                command_line: &command_line,
+            }
+            .execute()?,
             Self::CreateDockerComposePostgresEnvFile => {
                 CreateDockerComposePostgresEnvFileOperation {
                     command_line: &command_line,

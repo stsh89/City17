@@ -1,5 +1,4 @@
 use crate::error::OperationalError;
-use eyre::OptionExt;
 use std::path::PathBuf;
 
 pub trait LocateWorkspaceCargoToml {
@@ -17,13 +16,13 @@ where
     pub fn execute(&self) -> Result<PathBuf, OperationalError> {
         let workspace_cargo_toml_location = self.command_line.locate_workspace_cargo_toml()?;
 
-        let workspace_location = workspace_cargo_toml_location
-            .parent()
-            .ok_or_eyre(eyre::eyre!(
+        match workspace_cargo_toml_location.parent() {
+            Some(location) => Ok(location.to_path_buf()),
+            None => Err(eyre::eyre!(
                 "corrupted workspace Cargo.toml location: `{}`",
                 workspace_cargo_toml_location.display()
-            ))?;
-
-        Ok(workspace_location.to_path_buf())
+            )
+            .into()),
+        }
     }
 }
