@@ -1,9 +1,9 @@
-use eyre::Context;
-
 use crate::{
-    error::OperationalError, internal_operations::LocateWorkspaceCargoToml,
-    operations::InstallSqlxCli,
+    error::OperationalError,
+    internal_operations::LocateWorkspaceCargoToml,
+    operations::{InstallSqlxCli, StopAndRemoveContainers},
 };
+use eyre::Context;
 use std::{
     path::{Path, PathBuf},
     process::Command,
@@ -16,6 +16,25 @@ pub struct CommandLine;
 impl CommandLine {
     pub fn initialize() -> Self {
         CommandLine {}
+    }
+}
+
+impl InstallSqlxCli for CommandLine {
+    /// Execute `cargo install sqlx-cli` command.
+    fn install_sqlx_cli(&self) -> Result<(), OperationalError> {
+        let error_message = "failed to install sqlx-cli, try running `cargo install sqlx-cli`";
+
+        let status = Command::new(CARGO_PROGRAM)
+            .args(["install", "sqlx-cli"])
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message)?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
     }
 }
 
@@ -40,13 +59,16 @@ impl LocateWorkspaceCargoToml for CommandLine {
     }
 }
 
-impl InstallSqlxCli for CommandLine {
-    /// Execute `cargo install sqlx-cli` command.
-    fn install_sqlx_cli(&self) -> Result<(), OperationalError> {
-        let error_message = "failed to install sqlx-cli, try running `cargo install sqlx-cli`";
+impl StopAndRemoveContainers for CommandLine {
+    fn stop_and_remove_containers(
+        &self,
+        docker_compose_file_parent_location: &Path,
+    ) -> Result<(), OperationalError> {
+        let error_message = "failed to stop and remove containers";
 
-        let status = Command::new(CARGO_PROGRAM)
-            .args(["install", "sqlx-cli"])
+        let status = Command::new("docker")
+            .args(["compose", "down", "--volumes"])
+            .current_dir(docker_compose_file_parent_location)
             .status()
             .map_err(eyre::Error::new)
             .wrap_err_with(|| error_message)?;

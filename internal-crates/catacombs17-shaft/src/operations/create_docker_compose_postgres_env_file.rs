@@ -1,5 +1,5 @@
 use super::{
-    DOCKER_COMPOSE_POSTGRES_ENV_FILE_PATH, DockerComposeDatabaseSettings,
+    DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, DOCKER_DIRECTORY_NAME, DockerComposeDatabaseSettings,
     NewDockerComposeDatabaseSettings,
 };
 use crate::{
@@ -24,7 +24,9 @@ where
         }
         .execute()?;
 
-        let file_path = workspace_location.join(DOCKER_COMPOSE_POSTGRES_ENV_FILE_PATH);
+        let file_path = workspace_location
+            .join(DOCKER_DIRECTORY_NAME)
+            .join(DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME);
 
         if file_path.exists() {
             return Err(OperationalError::AlreadyExists(format!(
