@@ -6,6 +6,7 @@ mod get_docker_compose_config;
 mod get_docker_compose_datbase_env;
 mod install_sqlx_cli;
 mod remove_last_migration;
+mod revert_migration;
 mod run_migrations;
 mod stop_and_remove_containers;
 
@@ -19,6 +20,7 @@ pub use get_docker_compose_config::*;
 pub use get_docker_compose_datbase_env::*;
 pub use install_sqlx_cli::*;
 pub use remove_last_migration::*;
+pub use revert_migration::*;
 pub use run_migrations::*;
 pub use stop_and_remove_containers::*;
 

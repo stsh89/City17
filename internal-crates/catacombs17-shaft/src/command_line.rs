@@ -4,7 +4,7 @@ use crate::{
     operations::{
         CreateAndStartContainers, CreateDatabase, CreateMigration, CreateMigrationParameters,
         DockerComposeDatabaseEnv, FileLocation, FolderLocation, GetDockerComposeConfig,
-        InstallSqlxCli, RunMigrations, StopAndRemoveContainers,
+        InstallSqlxCli, RevertMigration, RunMigrations, StopAndRemoveContainers,
     },
 };
 use eyre::Context;
@@ -163,6 +163,38 @@ impl LocateWorkspaceCargoToml for CommandLine {
             let location = String::from_utf8_lossy(&output.stdout).to_string();
 
             FileLocation::from_str(location.trim())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
+impl RevertMigration for CommandLine {
+    /// Execute `sqlx migrate revert` command.
+    fn revert_migration(
+        &self,
+        database_env: DockerComposeDatabaseEnv,
+        crate_path: FolderLocation,
+    ) -> Result<(), OperationalError> {
+        let error_message = format!(
+            "failed to revert migration, try running `sqlx migrate revert --database-url {}`",
+            database_env.database_url(),
+        );
+
+        let status = Command::new(SQLX_PROGRAM)
+            .args([
+                "migrate",
+                "revert",
+                "--database-url",
+                &database_env.database_url(),
+            ])
+            .current_dir(crate_path.deref())
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message.clone())?;
+
+        if status.success() {
+            Ok(())
         } else {
             Err(eyre::eyre!(error_message).into())
         }
