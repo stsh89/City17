@@ -3,8 +3,9 @@ use crate::{
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
         CreateAndStartContainers, CreateDatabase, CreateMigration, CreateMigrationParameters,
-        DockerComposeDatabaseEnv, FileLocation, FolderLocation, GetDockerComposeConfig,
-        InstallSqlxCli, RevertMigration, RunMigrations, StopAndRemoveContainers,
+        DockerComposeDatabaseEnv, EnterDatabaseCli, FileLocation, FolderLocation,
+        GetDockerComposeConfig, InstallSqlxCli, RevertMigration, RunMigrations,
+        StopAndRemoveContainers,
     },
 };
 use eyre::Context;
@@ -92,8 +93,41 @@ impl CreateMigration for CommandLine {
         );
 
         let status = Command::new(SQLX_PROGRAM)
-            .args(["migrate", "add", "-r", &migration_name])
+            .args(["migrate", "add", "-r", migration_name])
             .current_dir(crate_path.deref())
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message.clone())?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
+impl EnterDatabaseCli for CommandLine {
+    /// Execute `docker compose exec db psql` command.
+    fn enter_database_cli(
+        &self,
+        docker_compose_file_location: FileLocation,
+        database_env: DockerComposeDatabaseEnv,
+    ) -> Result<(), OperationalError> {
+        let error_message = format!(
+            "failed to enter database cli, try running `docker compose exec db psql {}`",
+            database_env.database_url()
+        );
+
+        let status = Command::new(DOCKER_PROGRAM)
+            .args([
+                "compose",
+                "exec",
+                "db",
+                "psql",
+                &database_env.database_url(),
+            ])
+            .current_dir(docker_compose_file_location.parent().deref())
             .status()
             .map_err(eyre::Error::new)
             .wrap_err_with(|| error_message.clone())?;
