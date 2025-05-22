@@ -10,6 +10,7 @@ use std::{
 };
 
 const CARGO_PROGRAM: &str = "cargo";
+const DOCKER_PROGRAM: &str = "docker";
 
 pub struct CommandLine;
 
@@ -27,7 +28,7 @@ impl CreateAndStartContainers for CommandLine {
     ) -> Result<(), OperationalError> {
         let error_message = "failed to create and start containers";
 
-        let status = Command::new("docker")
+        let status = Command::new(DOCKER_PROGRAM)
             .args(["compose", "up", "-d"])
             .current_dir(docker_compose_file_location.parent().unwrap())
             .status()
