@@ -1,7 +1,9 @@
 use crate::{
     error::OperationalError,
     internal_operations::LocateWorkspaceCargoToml,
-    operations::{CreateAndStartContainers, InstallSqlxCli, StopAndRemoveContainers},
+    operations::{
+        CreateAndStartContainers, GetDockerComposeConfig, InstallSqlxCli, StopAndRemoveContainers,
+    },
 };
 use eyre::Context;
 use std::{
@@ -37,6 +39,29 @@ impl CreateAndStartContainers for CommandLine {
 
         if status.success() {
             Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
+impl GetDockerComposeConfig for CommandLine {
+    /// Execute `docker compose config` command.
+    fn get_docker_compose_config(
+        &self,
+        docker_compose_file_location: &Path,
+    ) -> Result<String, OperationalError> {
+        let error_message = "failed to get docker compose config";
+
+        let output = Command::new(DOCKER_PROGRAM)
+            .args(["compose", "config"])
+            .current_dir(docker_compose_file_location.parent().unwrap())
+            .output()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message)?;
+
+        if output.status.success() {
+            Ok(String::from_utf8_lossy(&output.stdout).to_string())
         } else {
             Err(eyre::eyre!(error_message).into())
         }

@@ -1,10 +1,12 @@
 mod create_and_start_containers;
 mod create_docker_compose_postgres_env_file;
+mod get_docker_compose_config;
 mod install_sqlx_cli;
 mod stop_and_remove_containers;
 
 pub use create_and_start_containers::*;
 pub use create_docker_compose_postgres_env_file::*;
+pub use get_docker_compose_config::*;
 pub use install_sqlx_cli::*;
 pub use stop_and_remove_containers::*;
 

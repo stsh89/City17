@@ -2,7 +2,7 @@ use crate::{
     command_line::CommandLine,
     operations::{
         CreateAndStartContainersOperation, CreateDockerComposePostgresEnvFileOperation,
-        InstallSqlxCliOperation, NewDockerComposeDatabaseSettings,
+        GetDockerComposeConfigOperation, InstallSqlxCliOperation, NewDockerComposeDatabaseSettings,
         StopAndRemoveContainersOperation,
     },
 };
@@ -25,6 +25,7 @@ pub struct CliState {
 pub enum Commands {
     CreateAndStartContainers,
     CreateDockerComposePostgresEnvFile,
+    GetDockerComposeConfig,
     InstallSqlxCli,
     StopAndRemoveContainers,
 }
@@ -47,6 +48,14 @@ impl Commands {
                     password: generate_password(16),
                     database_name: POSTGRES_DB.to_string(),
                 })?
+            }
+            Self::GetDockerComposeConfig => {
+                let config = GetDockerComposeConfigOperation {
+                    command_line: &command_line,
+                }
+                .execute()?;
+
+                println!("{config}");
             }
             Self::InstallSqlxCli => InstallSqlxCliOperation {
                 command_line: &command_line,
