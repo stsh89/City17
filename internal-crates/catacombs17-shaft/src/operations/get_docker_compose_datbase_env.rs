@@ -24,13 +24,7 @@ where
         }
         .execute()?;
 
-        let Some(docker_compose_directory) = docker_compose_file_location.parent() else {
-            return Err(eyre::eyre!(
-                "corrupted docker compose file location: `{}`",
-                docker_compose_file_location.display()
-            )
-            .into());
-        };
+        let docker_compose_directory = docker_compose_file_location.parent();
 
         let postgres_env_file_path =
             docker_compose_directory.join(DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME);

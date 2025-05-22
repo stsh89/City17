@@ -2,15 +2,12 @@ use crate::{
     error::OperationalError,
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
-        CreateAndStartContainers, CreateDatabase, DockerComposeDatabaseEnv, GetDockerComposeConfig,
-        InstallSqlxCli, StopAndRemoveContainers,
+        CreateAndStartContainers, CreateDatabase, DockerComposeDatabaseEnv, FileLocation,
+        GetDockerComposeConfig, InstallSqlxCli, StopAndRemoveContainers,
     },
 };
 use eyre::Context;
-use std::{
-    path::{Path, PathBuf},
-    process::Command,
-};
+use std::{ops::Deref, path::Path, process::Command};
 
 const CARGO_PROGRAM: &str = "cargo";
 const DOCKER_PROGRAM: &str = "docker";
@@ -28,13 +25,13 @@ impl CreateAndStartContainers for CommandLine {
     /// Execute `docker compose up -d` command.
     fn create_and_start_containers(
         &self,
-        docker_compose_file_location: &Path,
+        docker_compose_file_location: &FileLocation,
     ) -> Result<(), OperationalError> {
         let error_message = "failed to create and start containers";
 
         let status = Command::new(DOCKER_PROGRAM)
             .args(["compose", "up", "-d"])
-            .current_dir(docker_compose_file_location.parent().unwrap())
+            .current_dir(docker_compose_file_location.parent().deref())
             .status()
             .map_err(eyre::Error::new)
             .wrap_err_with(|| error_message)?;
@@ -81,13 +78,13 @@ impl GetDockerComposeConfig for CommandLine {
     /// Execute `docker compose config` command.
     fn get_docker_compose_config(
         &self,
-        docker_compose_file_location: &Path,
+        docker_compose_file_location: &FileLocation,
     ) -> Result<String, OperationalError> {
         let error_message = "failed to get docker compose config";
 
         let output = Command::new(DOCKER_PROGRAM)
             .args(["compose", "config"])
-            .current_dir(docker_compose_file_location.parent().unwrap())
+            .current_dir(docker_compose_file_location.parent().deref())
             .output()
             .map_err(eyre::Error::new)
             .wrap_err_with(|| error_message)?;
@@ -121,7 +118,7 @@ impl InstallSqlxCli for CommandLine {
 
 impl LocateWorkspaceCargoToml for CommandLine {
     /// Execute `cargo locate-project --workspace --message-format plain` command.
-    fn locate_workspace_cargo_toml(&self) -> Result<PathBuf, OperationalError> {
+    fn locate_workspace_cargo_toml(&self) -> Result<FileLocation, OperationalError> {
         let error_message = "failed to locate workspace Cargo.toml";
 
         let output = Command::new(CARGO_PROGRAM)
@@ -133,7 +130,7 @@ impl LocateWorkspaceCargoToml for CommandLine {
         if output.status.success() {
             let location = String::from_utf8_lossy(&output.stdout).to_string();
 
-            Ok(Path::new(&location).to_path_buf())
+            FileLocation::from_str(&location)
         } else {
             Err(eyre::eyre!(error_message).into())
         }

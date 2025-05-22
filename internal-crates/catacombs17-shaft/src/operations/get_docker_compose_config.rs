@@ -1,5 +1,4 @@
-use std::path::Path;
-
+use super::FileLocation;
 use crate::{
     error::OperationalError,
     internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
@@ -8,7 +7,7 @@ use crate::{
 pub trait GetDockerComposeConfig {
     fn get_docker_compose_config(
         &self,
-        docker_compose_file_location: &Path,
+        docker_compose_file_location: &FileLocation,
     ) -> Result<String, OperationalError>;
 }
 

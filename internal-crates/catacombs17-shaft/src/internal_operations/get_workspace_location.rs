@@ -1,8 +1,10 @@
-use crate::error::OperationalError;
-use std::path::PathBuf;
+use crate::{
+    error::OperationalError,
+    operations::{FileLocation, FolderLocation},
+};
 
 pub trait LocateWorkspaceCargoToml {
-    fn locate_workspace_cargo_toml(&self) -> Result<PathBuf, OperationalError>;
+    fn locate_workspace_cargo_toml(&self) -> Result<FileLocation, OperationalError>;
 }
 
 pub struct GetWorkspaceLocationOperation<'a, CL> {
@@ -13,16 +15,9 @@ impl<'a, CL> GetWorkspaceLocationOperation<'a, CL>
 where
     CL: LocateWorkspaceCargoToml,
 {
-    pub fn execute(&self) -> Result<PathBuf, OperationalError> {
+    pub fn execute(&self) -> Result<FolderLocation, OperationalError> {
         let workspace_cargo_toml_location = self.command_line.locate_workspace_cargo_toml()?;
 
-        match workspace_cargo_toml_location.parent() {
-            Some(location) => Ok(location.to_path_buf()),
-            None => Err(eyre::eyre!(
-                "corrupted workspace Cargo.toml location: `{}`",
-                workspace_cargo_toml_location.display()
-            )
-            .into()),
-        }
+        Ok(workspace_cargo_toml_location.parent())
     }
 }

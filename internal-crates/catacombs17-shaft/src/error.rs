@@ -6,6 +6,9 @@ pub enum OperationalError {
     #[error(transparent)]
     Internal(#[from] eyre::Report),
 
+    #[error("Invalid argument: {0}")]
+    InvalidArgument(String),
+
     #[error("{0}")]
     Validation(String),
 }

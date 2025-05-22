@@ -1,13 +1,13 @@
+use super::FileLocation;
 use crate::{
     error::OperationalError,
     internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
 };
-use std::path::Path;
 
 pub trait CreateAndStartContainers {
     fn create_and_start_containers(
         &self,
-        docker_compose_file_path: &Path,
+        docker_compose_file_location: &FileLocation,
     ) -> Result<(), OperationalError>;
 }
 

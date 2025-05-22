@@ -6,6 +6,8 @@ mod get_docker_compose_datbase_env;
 mod install_sqlx_cli;
 mod stop_and_remove_containers;
 
+use std::path::{Path, PathBuf};
+
 pub use create_and_start_containers::*;
 pub use create_database::*;
 pub use create_docker_compose_postgres_env_file::*;
@@ -19,6 +21,30 @@ use crate::error::OperationalError;
 const POSTGRES_USER_KEY: &str = "POSTGRES_USER";
 const POSTGRES_PASSWORD_KEY: &str = "POSTGRES_PASSWORD";
 const POSTGRES_DB_KEY: &str = "POSTGRES_DB";
+
+pub struct FolderLocation(PathBuf);
+pub struct FileLocation(PathBuf);
+
+impl FileLocation {
+    pub fn from_str(path: &str) -> Result<Self, OperationalError> {
+        Self::new(path.into())
+    }
+
+    pub fn new(path: PathBuf) -> Result<Self, OperationalError> {
+        if !path.is_file() {
+            return Err(OperationalError::InvalidArgument(format!(
+                "`{}` is not a file path",
+                path.display()
+            )));
+        }
+
+        Ok(FileLocation(path))
+    }
+
+    pub fn parent(&self) -> FolderLocation {
+        FolderLocation(self.0.parent().unwrap().to_path_buf())
+    }
+}
 
 pub struct DockerComposeDatabaseEnv {
     pub username: String,
@@ -83,5 +109,21 @@ impl DockerComposeDatabaseEnv {
             POSTGRES_DB_KEY,
             self.database_name
         )
+    }
+}
+
+impl std::ops::Deref for FileLocation {
+    type Target = Path;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl std::ops::Deref for FolderLocation {
+    type Target = Path;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
