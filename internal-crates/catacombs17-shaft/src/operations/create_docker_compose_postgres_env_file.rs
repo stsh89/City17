@@ -1,4 +1,4 @@
-use super::{DockerComposeDatabaseSettings, NewDockerComposeDatabaseSettings};
+use super::{DockerComposeDatabaseEnv, NewDockerComposeDatabaseEnv};
 use crate::{
     error::OperationalError,
     internal_operations::{
@@ -17,7 +17,7 @@ where
 {
     pub fn execute(
         &self,
-        new_settings: NewDockerComposeDatabaseSettings,
+        new_settings: NewDockerComposeDatabaseEnv,
     ) -> Result<(), OperationalError> {
         let docker_compose_file_location = GetDockerComposeFileLocationOperation {
             command_line: self.command_line,
@@ -42,7 +42,7 @@ where
             )));
         }
 
-        let settings = DockerComposeDatabaseSettings::new(new_settings)?;
+        let settings = DockerComposeDatabaseEnv::new(new_settings)?;
 
         std::fs::write(&postgres_env_file_path, settings.env_string()).map_err(eyre::Error::new)?;
 

@@ -2,7 +2,8 @@ use crate::{
     error::OperationalError,
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
-        CreateAndStartContainers, GetDockerComposeConfig, InstallSqlxCli, StopAndRemoveContainers,
+        CreateAndStartContainers, CreateDatabase, DockerComposeDatabaseEnv, GetDockerComposeConfig,
+        InstallSqlxCli, StopAndRemoveContainers,
     },
 };
 use eyre::Context;
@@ -13,6 +14,7 @@ use std::{
 
 const CARGO_PROGRAM: &str = "cargo";
 const DOCKER_PROGRAM: &str = "docker";
+const SQLX_PROGRAM: &str = "sqlx";
 
 pub struct CommandLine;
 
@@ -36,6 +38,36 @@ impl CreateAndStartContainers for CommandLine {
             .status()
             .map_err(eyre::Error::new)
             .wrap_err_with(|| error_message)?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
+impl CreateDatabase for CommandLine {
+    /// Execute `sqlx database create` command.
+    fn create_database(
+        &self,
+        database_env: &DockerComposeDatabaseEnv,
+    ) -> Result<(), OperationalError> {
+        let error_message = format!(
+            "failed to create database, try running `sqlx database create --database-url {}`",
+            database_env.database_url(),
+        );
+
+        let status = Command::new(SQLX_PROGRAM)
+            .args([
+                "database",
+                "create",
+                "--database-url",
+                &database_env.database_url(),
+            ])
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message.clone())?;
 
         if status.success() {
             Ok(())
