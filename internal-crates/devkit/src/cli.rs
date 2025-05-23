@@ -3,10 +3,10 @@ use crate::{
     operations::{
         CreateAndStartContainersOperation, CreateDatabaseOperation,
         CreateDockerComposePostgresEnvFileOperation, CreateMigrationOperation,
-        CreateQueryMetadataOperation, EnterDatabaseCliOperation, GetDockerComposeConfigOperation,
-        InstallSqlxCliOperation, MigrationParameters, NewDockerComposeDatabaseEnv,
-        RemoveLastMigrationOperation, RevertMigrationOperation, RunMigrationsOperation,
-        StopAndRemoveContainersOperation,
+        CreateQueryMetadataOperation, EnterDatabaseCliOperation, GetDatabaseUrlOperation,
+        GetDockerComposeConfigOperation, InstallSqlxCliOperation, MigrationParameters,
+        NewDockerComposeDatabaseEnv, RemoveLastMigrationOperation, RevertMigrationOperation,
+        RunMigrationsOperation, StopAndRemoveContainersOperation,
     },
 };
 use clap::{Parser, Subcommand};
@@ -42,6 +42,7 @@ pub enum Commands {
     },
     EnterDatabaseCli,
     GetDockerComposeConfig,
+    GetDatabaseUrl,
     InstallSqlxCli,
     RemoveLastMigration {
         #[arg(long)]
@@ -104,6 +105,14 @@ impl Commands {
                 .execute()?;
 
                 println!("{config}");
+            }
+            Self::GetDatabaseUrl => {
+                let database_url = GetDatabaseUrlOperation {
+                    command_line: &command_line,
+                }
+                .execute()?;
+
+                println!("{database_url}");
             }
             Self::InstallSqlxCli => InstallSqlxCliOperation {
                 command_line: &command_line,
