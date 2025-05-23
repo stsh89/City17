@@ -4,3 +4,11 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+chrono = { workspace = true }
+sqlx = { workspace = true, features = [
+    "chrono",
+    "postgres",
+    "runtime-tokio",
+    "uuid",
+] }
+uuid = { workspace = true, features = ["v7"] }
