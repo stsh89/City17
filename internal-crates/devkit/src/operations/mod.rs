@@ -44,7 +44,7 @@ impl FileLocation {
     pub fn new(path: PathBuf) -> Result<Self, OperationalError> {
         if !path.is_file() {
             return Err(OperationalError::InvalidArgument(format!(
-                "`{}` is not a file path",
+                "`{}` location does not exist or is not a file",
                 path.display()
             )));
         }
@@ -61,7 +61,7 @@ impl FolderLocation {
     pub fn new(path: PathBuf) -> Result<Self, OperationalError> {
         if !path.is_dir() {
             return Err(OperationalError::InvalidArgument(format!(
-                "`{}` is not a directory path",
+                "`{}` location does not exist or is not a directory",
                 path.display()
             )));
         }
