@@ -3,8 +3,8 @@ use crate::{
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
         CreateAndStartContainers, CreateDatabase, CreateMigration, CreateMigrationParameters,
-        DockerComposeDatabaseEnv, EnterDatabaseCli, FileLocation, FolderLocation,
-        GetDockerComposeConfig, InstallSqlxCli, RevertMigration, RunMigrations,
+        CreateQueryMetadata, DockerComposeDatabaseEnv, EnterDatabaseCli, FileLocation,
+        FolderLocation, GetDockerComposeConfig, InstallSqlxCli, RevertMigration, RunMigrations,
         StopAndRemoveContainers,
     },
 };
@@ -94,6 +94,33 @@ impl CreateMigration for CommandLine {
 
         let status = Command::new(SQLX_PROGRAM)
             .args(["migrate", "add", "-r", migration_name])
+            .current_dir(crate_path.deref())
+            .status()
+            .map_err(eyre::Error::new)
+            .wrap_err_with(|| error_message.clone())?;
+
+        if status.success() {
+            Ok(())
+        } else {
+            Err(eyre::eyre!(error_message).into())
+        }
+    }
+}
+
+impl CreateQueryMetadata for CommandLine {
+    /// Execute `sqlx prepare` command.
+    fn create_query_metadata(
+        &self,
+        crate_path: FolderLocation,
+        database_env: DockerComposeDatabaseEnv,
+    ) -> Result<(), OperationalError> {
+        let error_message = format!(
+            "failed to create query metadata, try running `sqlx prepare --database-url {}`",
+            database_env.database_url(),
+        );
+
+        let status = Command::new(SQLX_PROGRAM)
+            .args(["prepare", "--database-url", &database_env.database_url()])
             .current_dir(crate_path.deref())
             .status()
             .map_err(eyre::Error::new)

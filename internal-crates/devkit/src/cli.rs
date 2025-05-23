@@ -3,9 +3,10 @@ use crate::{
     operations::{
         CreateAndStartContainersOperation, CreateDatabaseOperation,
         CreateDockerComposePostgresEnvFileOperation, CreateMigrationOperation,
-        EnterDatabaseCliOperation, GetDockerComposeConfigOperation, InstallSqlxCliOperation,
-        MigrationParameters, NewDockerComposeDatabaseEnv, RemoveLastMigrationOperation,
-        RevertMigrationOperation, RunMigrationsOperation, StopAndRemoveContainersOperation,
+        CreateQueryMetadataOperation, EnterDatabaseCliOperation, GetDockerComposeConfigOperation,
+        InstallSqlxCliOperation, MigrationParameters, NewDockerComposeDatabaseEnv,
+        RemoveLastMigrationOperation, RevertMigrationOperation, RunMigrationsOperation,
+        StopAndRemoveContainersOperation,
     },
 };
 use clap::{Parser, Subcommand};
@@ -32,6 +33,10 @@ pub enum Commands {
         #[arg(long)]
         name: String,
 
+        #[arg(long)]
+        crate_path: String,
+    },
+    CreateQueryMetadata {
         #[arg(long)]
         crate_path: String,
     },
@@ -83,6 +88,11 @@ impl Commands {
                 migration_name: &name,
                 crate_path: &crate_path,
             })?,
+
+            Self::CreateQueryMetadata { crate_path } => CreateQueryMetadataOperation {
+                command_line: &command_line,
+            }
+            .execute(&crate_path)?,
             Self::EnterDatabaseCli => EnterDatabaseCliOperation {
                 command_line: &command_line,
             }
