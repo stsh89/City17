@@ -32,3 +32,17 @@ RETURNING id, title, formula, created_at, updated_at
     .fetch_one(pool)
     .await
 }
+
+pub async fn delete_symbol(pool: &PgPool, id: Uuid) -> sqlx::Result<Symbol> {
+    sqlx::query_as!(
+        Symbol,
+        "
+DELETE FROM wisdom.symbols
+WHERE id = $1
+RETURNING id, title, formula, created_at, updated_at
+        ",
+        id
+    )
+    .fetch_one(pool)
+    .await
+}
