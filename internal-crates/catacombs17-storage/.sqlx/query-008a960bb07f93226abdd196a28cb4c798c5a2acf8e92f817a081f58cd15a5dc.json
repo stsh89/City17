@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\nUPDATE wisdom.symbols\nSET\n    title = coalesce($2, title),\n    formula = coalesce($3, formula)\nWHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "008a960bb07f93226abdd196a28cb4c798c5a2acf8e92f817a081f58cd15a5dc"
+}
