@@ -8,3 +8,4 @@ clap = { workspace = true, features = ["derive"] }
 eyre = { workspace = true }
 thiserror = { workspace = true }
 rand = { workspace = true }
+uuid = { workspace = true, features = ["v7", "v4"] }

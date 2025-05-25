@@ -3,13 +3,14 @@ use crate::{
     operations::{
         CreateAndStartContainersOperation, CreateDatabaseOperation,
         CreateDockerComposePostgresEnvFileOperation, CreateMigrationOperation,
-        CreateQueryMetadataOperation, EnterDatabaseCliOperation, GetDatabaseUrlOperation,
-        GetDockerComposeConfigOperation, InstallSqlxCliOperation, MigrationParameters,
-        NewDockerComposeDatabaseEnv, RemoveLastMigrationOperation, RevertMigrationOperation,
-        RunMigrationsOperation, StopAndRemoveContainersOperation,
+        CreateQueryMetadataOperation, EnterDatabaseCliOperation, GenerateUuidOperation,
+        GetDatabaseUrlOperation, GetDockerComposeConfigOperation, InstallSqlxCliOperation,
+        MigrationParameters, NewDockerComposeDatabaseEnv, RemoveLastMigrationOperation,
+        RevertMigrationOperation, RunMigrationsOperation, StopAndRemoveContainersOperation,
+        UuidKind,
     },
 };
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 
 const POSTGRES_USER: &str = "gordon";
 const POSTGRES_DB: &str = "city17_dev";
@@ -41,6 +42,10 @@ pub enum Commands {
         crate_path: String,
     },
     EnterDatabaseCli,
+    GenerateUuid {
+        #[arg(long, value_enum)]
+        kind: UuidCliKind,
+    },
     GetDockerComposeConfig,
     GetDatabaseUrl,
     InstallSqlxCli,
@@ -57,6 +62,12 @@ pub enum Commands {
         crate_path: String,
     },
     StopAndRemoveContainers,
+}
+
+#[derive(Clone, ValueEnum)]
+pub enum UuidCliKind {
+    V4,
+    V7,
 }
 
 impl Commands {
@@ -98,6 +109,15 @@ impl Commands {
                 command_line: &command_line,
             }
             .execute()?,
+            Self::GenerateUuid { kind } => {
+                let kind = match kind {
+                    UuidCliKind::V4 => UuidKind::V4,
+                    UuidCliKind::V7 => UuidKind::V7,
+                };
+                let uuid = GenerateUuidOperation {}.execute(kind);
+
+                println!("{uuid}");
+            }
             Self::GetDockerComposeConfig => {
                 let config = GetDockerComposeConfigOperation {
                     command_line: &command_line,
