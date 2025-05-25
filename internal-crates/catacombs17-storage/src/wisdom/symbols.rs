@@ -10,6 +10,11 @@ pub struct Symbol {
     pub updated_at: DateTime<Utc>,
 }
 
+pub struct SymbolChanges {
+    pub title: Option<String>,
+    pub formula: Option<String>,
+}
+
 pub struct NewSymbol {
     pub title: String,
     pub formula: String,
@@ -33,16 +38,39 @@ RETURNING id, title, formula, created_at, updated_at
     .await
 }
 
-pub async fn delete_symbol(pool: &PgPool, id: Uuid) -> sqlx::Result<Symbol> {
-    sqlx::query_as!(
+pub async fn delete_symbol(pool: &PgPool, id: Uuid) -> sqlx::Result<bool> {
+    let rows_affected = sqlx::query_as!(
         Symbol,
         "
 DELETE FROM wisdom.symbols
 WHERE id = $1
-RETURNING id, title, formula, created_at, updated_at
         ",
         id
     )
-    .fetch_one(pool)
-    .await
+    .execute(pool)
+    .await?
+    .rows_affected();
+
+    Ok(rows_affected > 0)
+}
+
+pub async fn update_symbol(pool: &PgPool, id: Uuid, changes: SymbolChanges) -> sqlx::Result<bool> {
+    let rows_affected = sqlx::query_as!(
+        Symbol,
+        "
+UPDATE wisdom.symbols
+SET
+    title = coalesce($2, title),
+    formula = coalesce($3, formula)
+WHERE id = $1
+        ",
+        id,
+        changes.title,
+        changes.formula
+    )
+    .execute(pool)
+    .await?
+    .rows_affected();
+
+    Ok(rows_affected > 0)
 }

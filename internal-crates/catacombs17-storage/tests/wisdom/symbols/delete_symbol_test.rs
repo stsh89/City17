@@ -7,30 +7,34 @@ use uuid::Uuid;
 async fn it_deletes_symbol(pool: PgPool) -> sqlx::Result<()> {
     let count_was = support::count_symbols(&pool).await?;
 
-    let res = delete_symbol(
+    let is_deleted = delete_symbol(
         &pool,
         Uuid::try_parse("0197031d-b60c-7f60-9084-67b2a761bafb").unwrap(),
     )
-    .await;
-
-    assert!(res.is_ok());
+    .await?;
 
     let count = support::count_symbols(&pool).await?;
 
+    assert!(is_deleted);
     assert_eq!(count_was - count, 1);
 
     Ok(())
 }
 
 #[sqlx::test]
-async fn it_fails_if_symbol_does_not_exist(pool: PgPool) -> sqlx::Result<()> {
-    let res = delete_symbol(
+async fn it_returns_false_if_symbol_does_not_exist(pool: PgPool) -> sqlx::Result<()> {
+    let count_was = support::count_symbols(&pool).await?;
+
+    let is_deleted = delete_symbol(
         &pool,
         Uuid::try_parse("00000000-0000-0000-0000-000000000000").unwrap(),
     )
-    .await;
+    .await?;
 
-    assert!(matches!(res, Err(sqlx::Error::RowNotFound)));
+    let count = support::count_symbols(&pool).await?;
+
+    assert!(!is_deleted);
+    assert_eq!(count_was, count);
 
     Ok(())
 }
