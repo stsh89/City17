@@ -1,6 +1,12 @@
+use crate::{Page, PageToken};
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
+
+pub enum ListSymbolsParameters {
+    NextPage(PageToken),
+    FirstPage(usize),
+}
 
 pub struct Symbol {
     pub id: Uuid,
@@ -52,6 +58,75 @@ WHERE id = $1
     .rows_affected();
 
     Ok(rows_affected > 0)
+}
+
+pub async fn list_symbols(
+    pool: &PgPool,
+    parameters: ListSymbolsParameters,
+) -> sqlx::Result<Page<Symbol>> {
+    struct Filter {
+        limit: usize,
+        id: Option<Uuid>,
+    }
+
+    let filter = match parameters {
+        ListSymbolsParameters::NextPage(PageToken {
+            id,
+            limit,
+            has_more,
+        }) => {
+            if has_more {
+                return Ok(Page {
+                    items: vec![],
+                    token: None,
+                });
+            }
+
+            Filter {
+                limit: limit,
+                id: Some(id),
+            }
+        }
+        ListSymbolsParameters::FirstPage(l) => Filter {
+            limit: l + 1,
+            id: None,
+        },
+    };
+
+    let Filter { id, limit } = filter;
+
+    let mut items = sqlx::query_as!(
+        Symbol,
+        "
+SELECT id, title, formula, created_at, updated_at
+FROM wisdom.symbols
+WHERE case when $1::uuid is null then true else id > $1 end
+ORDER BY id DESC
+LIMIT $2
+        ",
+        id,
+        limit as i64
+    )
+    .fetch_all(pool)
+    .await?;
+
+    let has_more = items.len() == limit;
+
+    if has_more {
+        items.pop();
+    }
+
+    let token = if has_more {
+        Some(PageToken {
+            id: items.last().unwrap().id,
+            limit,
+            has_more,
+        })
+    } else {
+        None
+    };
+
+    Ok(Page { items, token })
 }
 
 pub async fn update_symbol(pool: &PgPool, id: Uuid, changes: SymbolChanges) -> sqlx::Result<bool> {
