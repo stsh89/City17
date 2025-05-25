@@ -75,10 +75,10 @@ pub async fn list_symbols(
             limit,
             has_more,
         }) => {
-            if has_more {
+            if !has_more {
                 return Ok(Page {
                     items: vec![],
-                    token: None,
+                    next_page_token: None,
                 });
             }
 
@@ -101,7 +101,6 @@ pub async fn list_symbols(
 SELECT id, title, formula, created_at, updated_at
 FROM wisdom.symbols
 WHERE case when $1::uuid is null then true else id > $1 end
-ORDER BY id DESC
 LIMIT $2
         ",
         id,
@@ -126,7 +125,10 @@ LIMIT $2
         None
     };
 
-    Ok(Page { items, token })
+    Ok(Page {
+        items,
+        next_page_token: token,
+    })
 }
 
 pub async fn update_symbol(pool: &PgPool, id: Uuid, changes: SymbolChanges) -> sqlx::Result<bool> {

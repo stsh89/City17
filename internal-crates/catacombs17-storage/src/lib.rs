@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 pub struct Page<T> {
     pub items: Vec<T>,
-    pub token: Option<PageToken>,
+    pub next_page_token: Option<PageToken>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -14,6 +14,12 @@ pub struct PageToken {
     id: Uuid,
     limit: usize,
     has_more: bool,
+}
+
+impl PageToken {
+    pub fn has_more(&self) -> bool {
+        self.has_more
+    }
 }
 
 impl FromStr for PageToken {
