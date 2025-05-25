@@ -350,6 +350,7 @@ dependencies = [
  "eyre",
  "rand 0.9.1",
  "thiserror",
+ "uuid",
 ]
 
 [[package]]

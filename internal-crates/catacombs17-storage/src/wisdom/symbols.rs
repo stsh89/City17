@@ -83,7 +83,7 @@ pub async fn list_symbols(
             }
 
             Filter {
-                limit: limit,
+                limit,
                 id: Some(id),
             }
         }
