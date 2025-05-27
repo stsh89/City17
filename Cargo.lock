@@ -208,6 +208,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "city17-api"
+version = "0.1.0"
+
+[[package]]
 name = "city17-cli"
 version = "0.1.0"
 dependencies = [
