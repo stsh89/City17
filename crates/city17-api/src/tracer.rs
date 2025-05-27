@@ -19,7 +19,7 @@ impl Drop for OtelGuard {
 }
 
 fn resource() -> Resource {
-    Resource::builder().with_service_name("Canopus API").build()
+    Resource::builder().with_service_name("City17 API").build()
 }
 
 fn init_tracer_provider() -> SdkTracerProvider {
@@ -41,7 +41,7 @@ fn init_tracer_provider() -> SdkTracerProvider {
 
 pub fn init_subscriber() -> OtelGuard {
     let tracer_provider = init_tracer_provider();
-    let tracer = tracer_provider.tracer("canopus-api-otel-subscriber");
+    let tracer = tracer_provider.tracer("city17-api-otel-subscriber");
 
     tracing_subscriber::registry()
         // The global level filter prevents the exporter network stack
