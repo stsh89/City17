@@ -1,9 +1,9 @@
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml},
-};
+use crate::internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml};
 
-use super::{DockerComposeDatabaseEnv, FolderLocation, GetDockerComposeDatabaseEnvOperation};
+use super::{
+    DockerComposeDatabaseEnv, FolderLocation, GetDockerComposeDatabaseEnvOperation,
+    OperationalError,
+};
 
 pub trait RevertMigration {
     fn revert_migration(

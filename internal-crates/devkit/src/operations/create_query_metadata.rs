@@ -1,8 +1,8 @@
-use super::{DockerComposeDatabaseEnv, FolderLocation, GetDockerComposeDatabaseEnvOperation};
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml},
+use super::{
+    DockerComposeDatabaseEnv, FolderLocation, GetDockerComposeDatabaseEnvOperation,
+    OperationalError,
 };
+use crate::internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml};
 
 pub trait CreateQueryMetadata {
     fn create_query_metadata(

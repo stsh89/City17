@@ -1,6 +1,5 @@
 mod cli;
 mod command_line;
-mod error;
 mod internal_operations;
 mod operations;
 

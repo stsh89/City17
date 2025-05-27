@@ -1,13 +1,10 @@
 use super::{
-    DockerComposeDatabaseEnv, NewDockerComposeDatabaseEnv, POSTGRES_DB_KEY, POSTGRES_PASSWORD_KEY,
-    POSTGRES_USER_KEY,
+    DockerComposeDatabaseEnv, NewDockerComposeDatabaseEnv, OperationalError, POSTGRES_DB_KEY,
+    POSTGRES_PASSWORD_KEY, POSTGRES_USER_KEY,
 };
-use crate::{
-    error::OperationalError,
-    internal_operations::{
-        DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, GetDockerComposeFileLocationOperation,
-        LocateWorkspaceCargoToml,
-    },
+use crate::internal_operations::{
+    DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, GetDockerComposeFileLocationOperation,
+    LocateWorkspaceCargoToml,
 };
 
 pub struct GetDockerComposeDatabaseEnvOperation<'a, CL> {

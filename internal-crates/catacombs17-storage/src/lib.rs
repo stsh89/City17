@@ -4,25 +4,25 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 use uuid::Uuid;
 
-pub struct Page<T> {
+pub struct QueryPage<T> {
     pub items: Vec<T>,
-    pub next_page_token: Option<PageToken>,
+    pub next_page_token: Option<QueryPageToken>,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct PageToken {
-    id: Uuid,
-    limit: usize,
-    has_more: bool,
+pub struct QueryPageToken {
+    pub id: Uuid,
+    pub limit: usize,
+    pub has_more: bool,
 }
 
-impl PageToken {
+impl QueryPageToken {
     pub fn has_more(&self) -> bool {
         self.has_more
     }
 }
 
-impl FromStr for PageToken {
+impl FromStr for QueryPageToken {
     type Err = eyre::Error;
 
     fn from_str(s: &str) -> eyre::Result<Self> {

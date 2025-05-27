@@ -1,8 +1,5 @@
-use super::FileLocation;
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
-};
+use super::{FileLocation, OperationalError};
+use crate::internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml};
 
 pub trait CreateAndStartContainers {
     fn create_and_start_containers(

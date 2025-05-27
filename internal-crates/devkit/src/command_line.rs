@@ -1,11 +1,10 @@
 use crate::{
-    error::OperationalError,
     internal_operations::LocateWorkspaceCargoToml,
     operations::{
         CreateAndStartContainers, CreateDatabase, CreateMigration, CreateMigrationParameters,
         CreateQueryMetadata, DockerComposeDatabaseEnv, EnterDatabaseCli, FileLocation,
-        FolderLocation, GetDockerComposeConfig, InstallSqlxCli, RevertMigration, RunMigrations,
-        StopAndRemoveContainers,
+        FolderLocation, GetDockerComposeConfig, InstallSqlxCli, OperationalError, RevertMigration,
+        RunMigrations, StopAndRemoveContainers,
     },
 };
 use eyre::Context;

@@ -1,8 +1,7 @@
-use super::{DockerComposeDatabaseEnv, FileLocation, GetDockerComposeDatabaseEnvOperation};
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
+use super::{
+    DockerComposeDatabaseEnv, FileLocation, GetDockerComposeDatabaseEnvOperation, OperationalError,
 };
+use crate::internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml};
 
 pub trait EnterDatabaseCli {
     fn enter_database_cli(

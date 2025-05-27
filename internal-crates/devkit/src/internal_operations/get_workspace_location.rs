@@ -1,7 +1,4 @@
-use crate::{
-    error::OperationalError,
-    operations::{FileLocation, FolderLocation},
-};
+use crate::operations::{FileLocation, FolderLocation, OperationalError};
 
 pub trait LocateWorkspaceCargoToml {
     fn locate_workspace_cargo_toml(&self) -> Result<FileLocation, OperationalError>;

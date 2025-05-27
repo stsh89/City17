@@ -1,10 +1,7 @@
-use super::{DockerComposeDatabaseEnv, NewDockerComposeDatabaseEnv};
-use crate::{
-    error::OperationalError,
-    internal_operations::{
-        DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, GetDockerComposeFileLocationOperation,
-        LocateWorkspaceCargoToml,
-    },
+use super::{DockerComposeDatabaseEnv, NewDockerComposeDatabaseEnv, OperationalError};
+use crate::internal_operations::{
+    DOCKER_COMPOSE_POSTGRES_ENV_FILE_NAME, GetDockerComposeFileLocationOperation,
+    LocateWorkspaceCargoToml,
 };
 
 pub struct CreateDockerComposePostgresEnvFileOperation<'a, CL> {

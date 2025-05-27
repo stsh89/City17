@@ -1,8 +1,5 @@
-use super::FolderLocation;
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml},
-};
+use super::{FolderLocation, OperationalError};
+use crate::internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml};
 
 pub trait CreateMigration {
     fn create_migration(

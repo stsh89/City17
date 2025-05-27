@@ -1,5 +1,5 @@
-use super::GetDockerComposeDatabaseEnvOperation;
-use crate::{error::OperationalError, internal_operations::LocateWorkspaceCargoToml};
+use super::{GetDockerComposeDatabaseEnvOperation, OperationalError};
+use crate::internal_operations::LocateWorkspaceCargoToml;
 
 pub struct GetDatabaseUrlOperation<'a, CL> {
     pub command_line: &'a CL,

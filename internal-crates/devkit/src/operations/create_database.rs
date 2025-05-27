@@ -1,5 +1,5 @@
-use super::{DockerComposeDatabaseEnv, GetDockerComposeDatabaseEnvOperation};
-use crate::{error::OperationalError, internal_operations::LocateWorkspaceCargoToml};
+use super::{DockerComposeDatabaseEnv, GetDockerComposeDatabaseEnvOperation, OperationalError};
+use crate::internal_operations::LocateWorkspaceCargoToml;
 
 pub trait CreateDatabase {
     fn create_database(

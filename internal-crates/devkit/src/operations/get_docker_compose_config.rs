@@ -1,8 +1,5 @@
-use super::FileLocation;
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
-};
+use super::{FileLocation, OperationalError};
+use crate::internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml};
 
 pub trait GetDockerComposeConfig {
     fn get_docker_compose_config(

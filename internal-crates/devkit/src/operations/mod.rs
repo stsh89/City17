@@ -4,6 +4,7 @@ mod create_docker_compose_postgres_env_file;
 mod create_migration;
 mod create_query_metadata;
 mod enter_database_cli;
+mod error;
 mod generate_uuid;
 mod get_database_url;
 mod get_docker_compose_config;
@@ -20,6 +21,7 @@ pub use create_docker_compose_postgres_env_file::*;
 pub use create_migration::*;
 pub use create_query_metadata::*;
 pub use enter_database_cli::*;
+pub use error::OperationalError;
 pub use generate_uuid::*;
 pub use get_database_url::*;
 pub use get_docker_compose_config::*;
@@ -30,7 +32,6 @@ pub use revert_migration::*;
 pub use run_migrations::*;
 pub use stop_and_remove_containers::*;
 
-use crate::error::OperationalError;
 use std::path::{Path, PathBuf};
 
 const POSTGRES_USER_KEY: &str = "POSTGRES_USER";

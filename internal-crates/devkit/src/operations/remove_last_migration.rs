@@ -1,8 +1,5 @@
-use super::{FileLocation, FolderLocation};
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml},
-};
+use super::{FileLocation, FolderLocation, OperationalError};
+use crate::internal_operations::{GetWorkspaceLocationOperation, LocateWorkspaceCargoToml};
 use std::ops::Deref;
 
 pub struct RemoveLastMigrationOperation<'a, CL> {

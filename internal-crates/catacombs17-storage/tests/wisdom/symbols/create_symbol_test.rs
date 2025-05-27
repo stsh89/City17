@@ -1,12 +1,12 @@
 use crate::support;
-use catacombs17_storage::wisdom::{NewSymbol, create_symbol};
+use catacombs17_storage::wisdom::{NewSymbolRecord, create_symbol};
 use sqlx::PgPool;
 
 #[sqlx::test]
 async fn it_creates_symbol(pool: PgPool) -> sqlx::Result<()> {
     let result = create_symbol(
         &pool,
-        NewSymbol {
+        NewSymbolRecord {
             title: "circle".to_string(),
             formula: "x² + y² = r²".to_string(),
         },
@@ -26,7 +26,7 @@ async fn it_creates_symbol(pool: PgPool) -> sqlx::Result<()> {
 async fn it_rejects_duplicate_symbols(pool: PgPool) -> sqlx::Result<()> {
     create_symbol(
         &pool,
-        NewSymbol {
+        NewSymbolRecord {
             title: "circle".to_string(),
             formula: "x² + y² = r²".to_string(),
         },
@@ -35,7 +35,7 @@ async fn it_rejects_duplicate_symbols(pool: PgPool) -> sqlx::Result<()> {
 
     let result = create_symbol(
         &pool,
-        NewSymbol {
+        NewSymbolRecord {
             title: "circle".to_string(),
             formula: "x² + y² = r²".to_string(),
         },

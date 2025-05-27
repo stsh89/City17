@@ -1,14 +1,14 @@
-use crate::{Page, PageToken};
+use crate::{QueryPage, QueryPageToken};
 use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
 
 pub enum ListSymbolsParameters {
-    NextPage(PageToken),
+    NextPage(QueryPageToken),
     FirstPage(usize),
 }
 
-pub struct Symbol {
+pub struct SymbolRecord {
     pub id: Uuid,
     pub title: String,
     pub formula: String,
@@ -16,21 +16,21 @@ pub struct Symbol {
     pub updated_at: DateTime<Utc>,
 }
 
-pub struct SymbolChanges {
+pub struct SymbolRecordChanges {
     pub title: Option<String>,
     pub formula: Option<String>,
 }
 
-pub struct NewSymbol {
+pub struct NewSymbolRecord {
     pub title: String,
     pub formula: String,
 }
 
-pub async fn create_symbol(pool: &PgPool, symbol: NewSymbol) -> sqlx::Result<Symbol> {
-    let NewSymbol { title, formula } = symbol;
+pub async fn create_symbol(pool: &PgPool, symbol: NewSymbolRecord) -> sqlx::Result<SymbolRecord> {
+    let NewSymbolRecord { title, formula } = symbol;
 
     sqlx::query_as!(
-        Symbol,
+        SymbolRecord,
         "
 INSERT INTO wisdom.symbols (id, title, formula)
 VALUES ($1, $2, $3)
@@ -63,20 +63,20 @@ WHERE id = $1
 pub async fn list_symbols(
     pool: &PgPool,
     parameters: ListSymbolsParameters,
-) -> sqlx::Result<Page<Symbol>> {
+) -> sqlx::Result<QueryPage<SymbolRecord>> {
     struct Filter {
         limit: usize,
         id: Option<Uuid>,
     }
 
     let filter = match parameters {
-        ListSymbolsParameters::NextPage(PageToken {
+        ListSymbolsParameters::NextPage(QueryPageToken {
             id,
             limit,
             has_more,
         }) => {
             if !has_more {
-                return Ok(Page {
+                return Ok(QueryPage {
                     items: vec![],
                     next_page_token: None,
                 });
@@ -96,7 +96,7 @@ pub async fn list_symbols(
     let Filter { id, limit } = filter;
 
     let mut items = sqlx::query_as!(
-        Symbol,
+        SymbolRecord,
         "
 SELECT id, title, formula, created_at, updated_at
 FROM wisdom.symbols
@@ -116,7 +116,7 @@ LIMIT $2
     }
 
     let token = if has_more {
-        Some(PageToken {
+        Some(QueryPageToken {
             id: items.last().unwrap().id,
             limit,
             has_more,
@@ -125,13 +125,17 @@ LIMIT $2
         None
     };
 
-    Ok(Page {
+    Ok(QueryPage {
         items,
         next_page_token: token,
     })
 }
 
-pub async fn update_symbol(pool: &PgPool, id: Uuid, changes: SymbolChanges) -> sqlx::Result<bool> {
+pub async fn update_symbol(
+    pool: &PgPool,
+    id: Uuid,
+    changes: SymbolRecordChanges,
+) -> sqlx::Result<bool> {
     let rows_affected = sqlx::query_as!(
         Symbol,
         "

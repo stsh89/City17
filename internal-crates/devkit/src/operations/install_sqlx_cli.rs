@@ -1,4 +1,4 @@
-use crate::error::OperationalError;
+use super::OperationalError;
 
 pub trait InstallSqlxCli {
     fn install_sqlx_cli(&self) -> Result<(), OperationalError>;

@@ -1,8 +1,7 @@
-use crate::{
-    error::OperationalError,
-    internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml},
-};
+use crate::internal_operations::{GetDockerComposeFileLocationOperation, LocateWorkspaceCargoToml};
 use std::path::Path;
+
+use super::OperationalError;
 
 pub trait StopAndRemoveContainers {
     fn stop_and_remove_containers(

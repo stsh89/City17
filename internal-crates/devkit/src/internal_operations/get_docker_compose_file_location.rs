@@ -2,7 +2,7 @@ use super::{
     DOCKER_COMPOSE_FILE_NAME, DOCKER_DIRECTORY_NAME, GetWorkspaceLocationOperation,
     LocateWorkspaceCargoToml,
 };
-use crate::{error::OperationalError, operations::FileLocation};
+use crate::operations::{FileLocation, OperationalError};
 
 pub struct GetDockerComposeFileLocationOperation<'a, CL> {
     pub command_line: &'a CL,

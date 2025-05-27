@@ -1,12 +1,12 @@
 use catacombs17_storage::{
-    Page,
+    QueryPage,
     wisdom::{ListSymbolsParameters, list_symbols},
 };
 use sqlx::PgPool;
 
 #[sqlx::test(fixtures("symbols"))]
 async fn it_lists_symbols(pool: PgPool) -> sqlx::Result<()> {
-    let Page {
+    let QueryPage {
         items: symbols,
         next_page_token,
     } = list_symbols(&pool, ListSymbolsParameters::FirstPage(3)).await?;
